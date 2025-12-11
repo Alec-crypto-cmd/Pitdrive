@@ -46,13 +46,9 @@ export default function MapScreen() {
             setLocation(loc);
 
             // Handle shortcut params from Home
-            // @ts-ignore
-            if (route.params?.destination) {
-                // @ts-ignore
-                setSearchQuery(route.params.destination);
-                // Auto-trigger search logic if location is ready, otherwise wait?
-                // For simplicity, user presses "Navigate" in widget for now, or we could auto-fire.
-                // Let's just prefill.
+            const params = route.params as any;
+            if (params?.destination) {
+                setSearchQuery(params.destination);
             }
         })();
     }, [route.params]);

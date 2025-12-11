@@ -3,8 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, Platform, Alert, ScrollView }
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Battery from 'expo-battery';
-// Camera is used for Flashlight (torch)
-import { Camera } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import Compass from '../components/Compass';
 
@@ -15,10 +14,11 @@ export default function WelcomeScreen() {
     const [time, setTime] = useState(new Date());
     const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
     const [isTorchOn, setIsTorchOn] = useState(false);
-    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+
+    // Camera Permissions
+    const [permission, requestPermission] = useCameraPermissions();
 
     // Colors
-    const textColor = '#FFFFFF';
     const accentColor = '#8B9C9A';
 
     // Clock
@@ -40,18 +40,14 @@ export default function WelcomeScreen() {
         return () => batterySub && batterySub.remove();
     }, []);
 
-    // Camera Permission (for Torch)
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
-
-    const toggleTorch = () => {
-        if (!hasPermission) {
-            Alert.alert("Permission", "Camera permission needed for flashlight.");
-            return;
+    // Torch Toggle
+    const toggleTorch = async () => {
+        if (!permission?.granted) {
+            const { granted } = await requestPermission();
+            if (!granted) {
+                Alert.alert("Permission", "Camera permission needed for flashlight.");
+                return;
+            }
         }
         setIsTorchOn(!isTorchOn);
     };
@@ -65,9 +61,10 @@ export default function WelcomeScreen() {
         <View style={styles.container}>
             {/* Hidden Camera for Torch Control */}
             {isTorchOn && (
-                <Camera
+                <CameraView
                     style={{ width: 1, height: 1, position: 'absolute' }}
-                    flashMode={Camera.Constants.FlashMode.torch}
+                    enableTorch={true}
+                    facing="back"
                 />
             )}
 
@@ -110,7 +107,7 @@ export default function WelcomeScreen() {
                         </TouchableOpacity>
 
                         {/* Settings Shortcut */}
-                        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Settings')}>
+                        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Settings' as never)}>
                             <Ionicons name="settings" size={32} color={accentColor} />
                             <Text style={styles.cardText}>SETUP</Text>
                         </TouchableOpacity>
