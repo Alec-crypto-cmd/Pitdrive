@@ -1,4 +1,4 @@
-name: Debug Android Build
+name: Build Android APK
 
 on:
   push:
@@ -24,54 +24,26 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Verify Environment
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Java version: $(java -version)"
-          pwd
-          ls -la
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
 
       - name: Install Dependencies
-        run: |
-          echo "Installing npm dependencies..."
-          npm install
-          echo "Dependencies installed. Listing node_modules:"
-          ls node_modules | head -20
+        run: npm install
 
-      - name: Verify TypeScript
-        run: |
-          echo "Running TypeScript check..."
-          npx tsc --noEmit || echo "TypeScript check failed but continuing..."
-
-      - name: Expo Prebuild (Verbose)
-        run: |
-          echo "Running expo prebuild..."
-          npx expo prebuild --platform android --clean
-          echo "Prebuild complete. Checking android directory..."
-          ls -la android || echo "Android directory not created!"
-
-      - name: List Android Structure
-        run: |
-          echo "Android directory structure:"
-          find android -type f -name "*.gradle" || echo "No gradle files found"
-          cat android/gradle.properties || echo "No gradle.properties"
+      - name: Expo Prebuild
+        run: npx expo prebuild --platform android --clean
 
       - name: Make Gradlew Executable
-        run: |
-          echo "Making gradlew executable..."
-          chmod +x android/gradlew
-          android/gradlew --version
+        run: chmod +x android/gradlew
 
-      - name: Build APK with Gradle (Verbose)
+      - name: Build APK with Gradle
         working-directory: ./android
-        run: |
-          echo "Building APK..."
-          ./gradlew assembleRelease --stacktrace --info
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: success()
         with:
-          name: app-release-debug
+          name: app-release
           path: android/app/build/outputs/apk/release/app-release.apk
