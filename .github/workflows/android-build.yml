@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Debug Android Build
 
 on:
   push:
@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Login Debug
-        run: echo "Starting build job..."
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -27,27 +24,54 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Verify Environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Java version: $(java -version)"
+          pwd
+          ls -la
+
       - name: Install Dependencies
-        run: npm install
+        run: |
+          echo "Installing npm dependencies..."
+          npm install
+          echo "Dependencies installed. Listing node_modules:"
+          ls node_modules | head -20
 
-      - name: Astro Prebuild Check
-        run: npx expo -v
+      - name: Verify TypeScript
+        run: |
+          echo "Running TypeScript check..."
+          npx tsc --noEmit || echo "TypeScript check failed but continuing..."
 
-      - name: Expo Prebuild
-        run: npx expo prebuild --platform android
+      - name: Expo Prebuild (Verbose)
+        run: |
+          echo "Running expo prebuild..."
+          npx expo prebuild --platform android --clean
+          echo "Prebuild complete. Checking android directory..."
+          ls -la android || echo "Android directory not created!"
+
+      - name: List Android Structure
+        run: |
+          echo "Android directory structure:"
+          find android -type f -name "*.gradle" || echo "No gradle files found"
+          cat android/gradle.properties || echo "No gradle.properties"
 
       - name: Make Gradlew Executable
-        run: chmod +x android/gradlew
+        run: |
+          echo "Making gradlew executable..."
+          chmod +x android/gradlew
+          android/gradlew --version
 
-      - name: Build APK with Gradle
+      - name: Build APK with Gradle (Verbose)
         working-directory: ./android
-        run: ./gradlew assembleRelease
-
-      - name: List Output
-        run: ls -R android/app/build/outputs/apk/release/
+        run: |
+          echo "Building APK..."
+          ./gradlew assembleRelease --stacktrace --info
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: app-release
+          name: app-release-debug
           path: android/app/build/outputs/apk/release/app-release.apk
