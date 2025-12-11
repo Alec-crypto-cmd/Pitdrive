@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import WelcomeScreen from './src/screens/WelcomeScreen';
+import AppNavigator from './src/navigation/TabNavigator';
 
 export default function App() {
   return (
-    // Container style is handled by WelcomeScreen now for full color coverage
-    <View style={{ flex: 1 }}>
-      <WelcomeScreen />
+    <View style={{ flex: 1, backgroundColor: '#002B36' }}>
+      <StatusBar style="light" />
+      <AppNavigator />
     </View>
   );
 }
