@@ -34,6 +34,9 @@
         {
           "locationWhenInUsePermission": "Show your location on the map."
         }
+      ],
+      [
+        "@maplibre/maplibre-react-native"
       ]
     ]
   }

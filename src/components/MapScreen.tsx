@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
-import MapView, { Marker, UrlTile } from 'react-native-maps';
+import MapLibreGL from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
+
+// Initialize MapLibre (no implementation needed usually, but good practice if setting access tokens, which we don't have)
+MapLibreGL.setAccessToken(null);
 
 export default function MapScreen() {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [permissionGranted, setPermissionGranted] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -14,7 +18,7 @@ export default function MapScreen() {
                 setErrorMsg('Permission to access location was denied');
                 return;
             }
-
+            setPermissionGranted(true);
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location);
         })();
@@ -22,37 +26,39 @@ export default function MapScreen() {
 
     return (
         <View style={styles.container}>
-            <MapView
+            <MapLibreGL.MapView
                 style={styles.map}
-                mapType="none" // Disable standard map to show only tiles
-                showsUserLocation={true}
-                showsMyLocationButton={true}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
+                styleURL={MapLibreGL.StyleURL.Empty} // Start with empty style to avoid default vector tiles if any
+                logoEnabled={false}
+                attributionEnabled={false} // We add custom attribution for OpenTopoMap
             >
-                <UrlTile
-                    /**
-                     * OpenTopoMap Tiles
-                     * Attribution: Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap (CC-BY-SA)
-                     */
-                    urlTemplate="https://a.tile.opentopomap.org/{z}/{x}/{y}.png"
-                    maximumZ={17}
-                    flipY={false}
+                <MapLibreGL.Camera
+                    zoomLevel={12}
+                    centerCoordinate={location ? [location.coords.longitude, location.coords.latitude] : [-122.4324, 37.78825]}
+                    animationMode={'flyTo'}
+                    animationDuration={2000}
                 />
-                {location && (
-                    <Marker
-                        coordinate={{
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                        }}
-                        title={"You are here"}
-                    />
+
+                {/* User Location */}
+                {permissionGranted && (
+                    <MapLibreGL.UserLocation visible={true} showsUserHeadingIndicator={true} />
                 )}
-            </MapView>
+
+                {/* OpenTopoMap Source & Layer */}
+                <MapLibreGL.RasterSource
+                    id="opentopomap"
+                    tileUrlTemplates={["https://a.tile.opentopomap.org/{z}/{x}/{y}.png"]}
+                    tileSize={256}
+                >
+                    <MapLibreGL.RasterLayer
+                        id="opentopomap-layer"
+                        sourceID="opentopomap"
+                        style={{ rasterOpacity: 1 }}
+                    />
+                </MapLibreGL.RasterSource>
+
+            </MapLibreGL.MapView>
+
             {errorMsg && (
                 <View style={styles.errorContainer}>
                     <Text style={styles.errorText}>{errorMsg}</Text>
