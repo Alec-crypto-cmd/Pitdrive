@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: bike-os/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -27,19 +27,17 @@ jobs:
           java-version: '17'
 
       - name: Install Dependencies
-        working-directory: ./bike-os
         run: npm ci
 
       - name: Expo Prebuild
-        working-directory: ./bike-os
         run: npx expo prebuild --platform android --no-interactive
 
       - name: Build APK with Gradle
-        working-directory: ./bike-os/android
+        working-directory: ./android
         run: ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: bike-os/android/app/build/outputs/apk/release/app-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
