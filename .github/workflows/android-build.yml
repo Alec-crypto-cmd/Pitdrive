@@ -17,20 +17,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Expo Prebuild
         run: npx expo prebuild --platform android --no-interactive
+
+      - name: Make Gradlew Executable
+        run: chmod +x android/gradlew
 
       - name: Build APK with Gradle
         working-directory: ./android
