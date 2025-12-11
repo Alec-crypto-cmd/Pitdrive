@@ -1,19 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import MapScreen from './src/components/MapScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <MapScreen />
-      <StatusBar style="auto" />
+    // Container style is handled by WelcomeScreen now for full color coverage
+    <View style={{ flex: 1 }}>
+      <WelcomeScreen />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});
