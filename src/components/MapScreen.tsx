@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Dimensions, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
 import MapLibreGL from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
-import polyline from '@mapbox/polyline';
+import * as polyline from '@mapbox/polyline';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -34,7 +34,7 @@ export default function MapScreen() {
     // UI State
     const [widgetMode, setWidgetMode] = useState<'search' | 'preview' | 'navigating'>('search');
 
-    const cameraRef = useRef<MapLibreGL.Camera>(null);
+    const cameraRef = useRef<any>(null);
 
     // Initial Location & Params handling
     useEffect(() => {
@@ -94,7 +94,7 @@ export default function MapScreen() {
 
             // Decode polyline to coordinates
             const decodedPoints = polyline.decode(geometry); // returns [lat, lon]
-            const geojsonCoords = decodedPoints.map(p => [p[1], p[0]]); // convert to [lon, lat] for GeoJSON
+            const geojsonCoords = decodedPoints.map((p: [number, number]) => [p[1], p[0]]); // convert to [lon, lat] for GeoJSON
 
             // Update State
             setRouteCoords({
@@ -177,7 +177,6 @@ export default function MapScreen() {
         <View style={styles.container}>
             <MapLibreGL.MapView
                 style={styles.map}
-                styleURL={MapLibreGL.StyleURL.Empty}
                 logoEnabled={false}
                 attributionEnabled={false}
             >
@@ -185,9 +184,8 @@ export default function MapScreen() {
                     ref={cameraRef}
                     zoomLevel={14}
                     centerCoordinate={location ? [location.coords.longitude, location.coords.latitude] : [-122.4324, 37.78825]}
-                    animationMode={'flyTo'}
+                    animationMode={"flyTo"}
                     animationDuration={1000}
-                    followingUserMode={isNavigating ? 'course' : undefined}
                 />
 
                 {/* Esri Tiles */}

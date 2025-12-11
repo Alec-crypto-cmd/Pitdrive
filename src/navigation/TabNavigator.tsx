@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // built into Expo
+import { Ionicons } from '@expo/vector-icons';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import MapScreen from '../components/MapScreen';
@@ -25,7 +25,8 @@ export default function AppNavigator() {
                 card: BAR_BG,
                 text: '#fff',
                 border: '#073642'
-            }
+            },
+            fonts: DarkTheme.fonts
         }}>
             <Tab.Navigator
                 screenOptions={({ route }) => ({
