@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "bike-os",
+    "name": "Bike OS",
     "slug": "bike-os",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -14,16 +14,19 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bikeos.app"
+      "bundleIdentifier": "com.pitbikeos.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.bikeos.app",
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.pitbikeos.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +35,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Show your location on the map."
+          "locationAlwaysAndWhenInUsePermission": "Allow Bike OS to use your location for navigation."
         }
       ],
       [
