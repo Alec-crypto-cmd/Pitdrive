@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Expo Prebuild
-        run: npx expo prebuild --platform android --no-interactive
+        run: npx expo prebuild --platform android
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
