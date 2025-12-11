@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import MapLibreGL from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
 
-// Initialize MapLibre (no implementation needed usually, but good practice if setting access tokens, which we don't have)
+// Initialize MapLibre
 MapLibreGL.setAccessToken(null);
 
 export default function MapScreen() {
@@ -28,9 +28,9 @@ export default function MapScreen() {
         <View style={styles.container}>
             <MapLibreGL.MapView
                 style={styles.map}
-                styleURL={MapLibreGL.StyleURL.Empty} // Start with empty style to avoid default vector tiles if any
+                styleURL={MapLibreGL.StyleURL.Empty}
                 logoEnabled={false}
-                attributionEnabled={false} // We add custom attribution for OpenTopoMap
+                attributionEnabled={false}
             >
                 <MapLibreGL.Camera
                     zoomLevel={12}
@@ -39,20 +39,19 @@ export default function MapScreen() {
                     animationDuration={2000}
                 />
 
-                {/* User Location */}
                 {permissionGranted && (
                     <MapLibreGL.UserLocation visible={true} showsUserHeadingIndicator={true} />
                 )}
 
-                {/* OpenTopoMap Source & Layer */}
+                {/* Esri World Topo Map Source & Layer */}
                 <MapLibreGL.RasterSource
-                    id="opentopomap"
-                    tileUrlTemplates={["https://a.tile.opentopomap.org/{z}/{x}/{y}.png"]}
+                    id="esri-topo"
+                    tileUrlTemplates={["https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"]}
                     tileSize={256}
                 >
                     <MapLibreGL.RasterLayer
-                        id="opentopomap-layer"
-                        sourceID="opentopomap"
+                        id="esri-topo-layer"
+                        sourceID="esri-topo"
                         style={{ rasterOpacity: 1 }}
                     />
                 </MapLibreGL.RasterSource>
@@ -65,7 +64,7 @@ export default function MapScreen() {
                 </View>
             )}
             <View style={styles.attribution}>
-                <Text style={styles.attributionText}>© OpenTopoMap (CC-BY-SA)</Text>
+                <Text style={styles.attributionText}>Tiles © Esri — Source: Esri et al.</Text>
             </View>
         </View>
     );
